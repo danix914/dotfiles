@@ -107,6 +107,8 @@ set tabstop=4                   " Tab width (Python standard)
 set shiftwidth=4                " Indent width
 set softtabstop=4               " Soft tab width
 set shiftround                  " Round indent to multiple of shiftwidth
+set listchars=tab:=,trail:
+set list
 
 " Folding (useful for Python)
 set foldmethod=indent           " Fold based on indentation
@@ -116,8 +118,12 @@ set foldnestmax=10              " Maximum fold nesting
 " Scrolling and display
 set scrolloff=3                 " Keep 3 lines above/below cursor (reduced for VPS)
 set sidescrolloff=5             " Keep 5 columns left/right of cursor
-set nowrap                      " Don't wrap long lines
+set wrap                      " Don't wrap long lines
 set linebreak                   " Break lines at word boundaries
+set breakindent
+" set breakindentopt=shift:3
+set showbreak=\ \               " with a trailing space
+" highlight NonText ctermfg=lightgray ctermbg=lightblue guibg=#003366
 
 " Encoding and format
 set encoding=utf-8              " Use UTF-8 encoding
@@ -127,7 +133,7 @@ set fileformat=unix             " Unix line endings
 " Performance optimizations for VPS
 set ttyfast                     " Fast terminal connection
 set lazyredraw                  " Don't redraw during macros
-set synmaxcol=300               " Only highlight first 200 columns
+set synmaxcol=500               " Only highlight first 200 columns
 set ttimeoutlen=50              " Faster key sequence timeout
 
 " Mouse (if supported)
@@ -202,6 +208,7 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
+nnoremap <Tab><Tab> <C-w>w
 
 " Better indenting in visual mode
 vnoremap < <gv
@@ -270,7 +277,7 @@ let g:ale_completion_autoimport = 1
 let g:ale_fix_on_save = 0                        " Disabled by default for VPS performance
 
 " Faster linting
-let g:ale_lint_delay = 1000                      " Delay linting for performance
+let g:ale_lint_delay = 800                      " Delay linting for performance
 let g:ale_lint_on_text_changed = 'never'        " Only lint on save/enter
 let g:ale_lint_on_insert_leave = 1
 
@@ -309,7 +316,9 @@ if exists('g:plugs') && has_key(g:plugs, 'indentLine')
     let g:indentLine_enabled = 1
     let g:indentLine_char = '┊'
     let g:indentLine_faster = 1                  " Use faster drawing method
-    let g:indentLine_setConceal = 0              " Don't hide quotes in JSON
+    " let g:indentLine_setConceal = 0              " Don't hide quotes in JSON
+    let g:indentLine_conceallevel = 1
+    let g:indentLine_concealcursor = ''     " do not hide char at cursor(?)
 endif
 
 " UndoTree (if installed)
@@ -341,6 +350,12 @@ endif
 autocmd FileType sh setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType sh setlocal foldmethod=syntax
 autocmd FileType sh setlocal omnifunc=syntaxcomplete#Complete
+
+" JSON setting for IndentLine
+" autocmd FileType json setlocal conceallevel=2 concealcursor=
+autocmd FileType json setlocal conceallevel=0
+autocmd FileType json let b:indentLine_enabled = 0
+
 
 " ========================================
 " Custom Functions
@@ -384,6 +399,30 @@ command! MemCheck call CheckMemory()
 " Quick edit vimrc
 nnoremap <leader>ev :edit $MYVIMRC<CR>
 nnoremap <leader>sv :source $MYVIMRC<CR>
+
+" toggle number, linebreak, breakindent, showbreak
+function! ToggleViewSettings()
+    IndentLinesToggle
+    set number!
+    set linebreak!
+    set breakindent!
+    set list!
+    if &showbreak == ''
+        set showbreak=\ \               " with a trailing space
+    else
+        set showbreak=
+    endif
+
+    " show info
+    echo "IndentLine: " . (exists('b:indentLine_enabled') && b:indentLine_enabled ? 'ON' : 'OFF') .
+        \ " | Number: " . (&number ? 'ON' : 'OFF') .
+        \ " | LineBreak: " . (&linebreak ? 'ON' : 'OFF') .
+        \ " | BreakIndent: " . (&breakindent ? 'ON' : 'OFF') .
+        \ " | ShowBreak: " . (&showbreak != '' ? 'ON' : 'OFF')
+endfunction
+
+nnoremap <leader>c :call ToggleViewSettings()<CR>
+inoremap <leader>c <C-O>:call ToggleViewSettings()<CR>
 
 " ========================================
 " Auto Commands

@@ -70,7 +70,7 @@ fi
 # export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n\$ '
 
 # Or a richer prompt
-export PS1='\[\033[01;32m\]\u\[\033[00m\]@\[\033[01;34m\]\h\[\033[00m\]:\[\033[01;33m\]\w\[\033[00m\]\n\$ '
+export PS1='\[\033[01;32m\]\u\[\033[00m\]@\[\033[01;34m\]\h\[\033[00m\]:\[\033[01;36m\]\w\[\033[00m\] \[\033[01;35m\]$(__git_ps1 "(%s)")\[\033[0m\]\n\$ '
 
 
 # enable color support of ls and also add handy aliases
@@ -101,6 +101,17 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias hsync='history -a; history -c; history -r'
+alias gitpr='git pull --rebase'
+alias snn='ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no"'
+act_python_venv() {
+  local venvdir="$1"
+  if [[ -z $venvdir ]]; then
+    #venvdir="$(ls -t1d v{e,E}* 2>/dev/null | head -n1)"
+    venvdir="$(find . -maxdepth 1 -iname "ve*" -type d -printf '%T@ %p\n' | sort -nr | cut -d' ' -f2- | head -n1)"
+  fi
+  source "${venvdir}/bin/activate"
+}
+alias av='act_python_venv'
 
 # tmux 相關別名
 alias tmux='tmux -u'  # 強制 UTF-8 支援
@@ -127,11 +138,13 @@ fi
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
+  if [ -f ~/.git-completion.sh ]; then
+    . ~/.git-completion.sh
+  elif [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
   elif [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
   fi
 fi
 
-. "$HOME/.local/bin/env"
+# . "$HOME/.local/bin/env"

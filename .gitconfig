@@ -27,9 +27,12 @@
     staged = diff --staged
     who = shortlog -s --
     lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    lga = log --graph --pretty=ol --abbrev-commit --date=local --all
     prs = pull --recurse-submodules
 [core]
 	excludesfile = ~/.gitignore
 	editor = vim
 [branch]
     autosetuprebase = always
+[pretty]
+    ol = format:%Cred%h%Creset -%C(yellow)%d%Creset %s %C(bold black)- %Creset%Cgreen(%ar)%Creset
